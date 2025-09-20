@@ -1,13 +1,11 @@
 [build]
 builder = "nixpacks"
 
-[deploy]
-startCommand = "npm run build && npx serve -s build -l $PORT"
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+[build.nixpacks]
+install = "npm install"
+build = "npm run build"
+start = "npx serve -s build -l $PORT"
 
-[healthcheck]
-path = "/"
-interval = 30
-timeout = 10
-retries = 3
+[deploy]
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
