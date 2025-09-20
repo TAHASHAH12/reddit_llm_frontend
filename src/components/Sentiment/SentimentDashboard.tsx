@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, TrendingDown, Users, MessageCircle, Calendar, Brain, Target, Lightbulb, Award, AlertCircle, CheckCircle } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Users, MessageCircle, Brain, Target, Lightbulb, AlertCircle, CheckCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { Progress } from '../ui/Progress';
-import { Skeleton } from '../ui/Skeleton';
 import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useApp } from '../../contexts/AppContext';
 import { redditAPI } from '../../services/api';
@@ -141,7 +139,7 @@ const MetricCard: React.FC<{
   </Card>
 );
 
-const InsightsPanel: React.FC<{ insights: SentimentInsights; brandName: string }> = ({ insights, brandName }) => (
+const InsightsPanel: React.FC<{ insights: SentimentInsights; brandName: string }> = ({ insights }) => (
   <div className="space-y-6">
     <Card>
       <CardHeader>
@@ -330,6 +328,7 @@ export const SentimentDashboard: React.FC = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Dashboard Header */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -393,6 +392,7 @@ export const SentimentDashboard: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Loading State */}
       {isLoading && (
         <Card>
           <CardContent className="py-12">
@@ -411,8 +411,10 @@ export const SentimentDashboard: React.FC = () => {
         </Card>
       )}
 
+      {/* Analytics Content */}
       {analyticsData && !isLoading && (
         <>
+          {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MetricCard
               title="Total Posts Analyzed"
@@ -454,7 +456,9 @@ export const SentimentDashboard: React.FC = () => {
             />
           </div>
 
+          {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Sentiment Chart */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>Sentiment Analysis Overview</CardTitle>
@@ -464,6 +468,7 @@ export const SentimentDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Quick Stats */}
             <Card>
               <CardHeader>
                 <CardTitle>Analysis Summary</CardTitle>
@@ -508,6 +513,7 @@ export const SentimentDashboard: React.FC = () => {
             </Card>
           </div>
 
+          {/* Detailed Insights */}
           <InsightsPanel 
             insights={analyticsData.analysis.insights} 
             brandName={analyticsData.brandName}
@@ -515,6 +521,7 @@ export const SentimentDashboard: React.FC = () => {
         </>
       )}
 
+      {/* Empty State */}
       {!analyticsData && !isLoading && (
         <Card>
           <CardContent className="text-center py-12">

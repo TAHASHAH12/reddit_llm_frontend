@@ -9,3 +9,4 @@ start = "npx serve -s build -l $PORT"
 [deploy]
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
+CI=false

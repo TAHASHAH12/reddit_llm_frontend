@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download, Calendar, MapPin, SortAsc, Loader2, ExternalLink, MessageCircle, TrendingUp, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Filter, Download, Calendar, MapPin, Loader2, ExternalLink, MessageCircle, TrendingUp, Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -10,7 +10,6 @@ import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useApp } from '../../contexts/AppContext';
 import { redditAPI } from '../../services/api';
 import { RedditPost } from '../../types';
-import { cn } from '../../utils/cn';
 
 interface SearchFilters {
   keywords: string;
@@ -21,7 +20,7 @@ interface SearchFilters {
   maxResults: number;
 }
 
-const SearchResultCard: React.FC<{ post: RedditPost; onSelect?: (post: RedditPost) => void }> = ({ post, onSelect }) => {
+const SearchResultCard: React.FC<{ post: RedditPost }> = ({ post }) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -37,7 +36,7 @@ const SearchResultCard: React.FC<{ post: RedditPost; onSelect?: (post: RedditPos
   };
 
   return (
-    <Card className="hover:shadow-md transition-all cursor-pointer" onClick={() => onSelect?.(post)}>
+    <Card className="hover:shadow-md transition-all">
       <CardContent className="p-4">
         <div className="flex items-start justify-between space-x-4">
           <div className="flex-1 space-y-2">
@@ -142,7 +141,6 @@ export const SearchInterface: React.FC = () => {
   
   const [results, setResults] = useState<RedditPost[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<RedditPost | null>(null);
   const [searchStats, setSearchStats] = useState({
     totalResults: 0,
     avgScore: 0,
@@ -171,37 +169,11 @@ export const SearchInterface: React.FC = () => {
       const keywords = filters.keywords.split(',').map(k => k.trim()).filter(k => k);
       addToSearchHistory(filters.keywords);
 
-      let response;
-      if (filters.subreddits.trim()) {
-        const subredditList = filters.subreddits.split(',').map(s => s.trim()).filter(s => s);
-        const promises = subredditList.map(subreddit => 
-          redditAPI.searchKeywords(keywords, {
-            limit: Math.ceil(filters.maxResults / subredditList.length),
-            timeFilter: filters.timeFilter,
-            sortBy: filters.sortBy,
-            subreddit: subreddit
-          })
-        );
-        
-        const responses = await Promise.allSettled(promises);
-        const allResults: RedditPost[] = [];
-        
-        responses.forEach((result, index) => {
-          if (result.status === 'fulfilled') {
-            allResults.push(...result.value.data.data);
-          } else {
-            console.warn(`Failed to search in ${subredditList[index]}:`, result.reason);
-          }
-        });
-        
-        response = { data: { data: allResults } };
-      } else {
-        response = await redditAPI.searchKeywords(keywords, {
-          limit: filters.maxResults,
-          timeFilter: filters.timeFilter,
-          sortBy: filters.sortBy
-        });
-      }
+      const response = await redditAPI.searchKeywords(keywords, {
+        limit: filters.maxResults,
+        timeFilter: filters.timeFilter,
+        sortBy: filters.sortBy
+      });
 
       let filteredResults = response.data.data;
       
@@ -220,7 +192,6 @@ export const SearchInterface: React.FC = () => {
       }
 
       filteredResults = filteredResults.slice(0, filters.maxResults);
-
       setResults(filteredResults);
 
       if (filteredResults.length > 0) {
@@ -447,7 +418,6 @@ export const SearchInterface: React.FC = () => {
               <SearchResultCard
                 key={post.id}
                 post={post}
-                onSelect={setSelectedPost}
               />
             ))}
           </div>
