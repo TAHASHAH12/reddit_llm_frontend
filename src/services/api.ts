@@ -1,7 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
 import { ApiResponse, BrandAnalysisResponse, RedditPost } from '../types';
 
+// Use environment variable or fallback
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -13,7 +16,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {
@@ -37,7 +40,7 @@ apiClient.interceptors.response.use(
     } else if (error.response?.status >= 500) {
       error.message = 'Server error. Please try again later.';
     } else if (!error.response) {
-      error.message = 'Network error. Please check your connection.';
+      error.message = 'Network error. Please check your connection and try again.';
     }
     
     return Promise.reject(error);
